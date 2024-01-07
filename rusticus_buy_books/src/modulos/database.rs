@@ -34,7 +34,7 @@ pub fn add_produto() -> Result<()> {
 
     conn.execute(
         "INSERT INTO produtos (Produto, Marca_ou_qualidade, Conteúdo) VALUES (?1, ?2, ?3)",
-        (&nome, &marca, &conteudo),
+        (&nome.trim(), &marca.trim(), &conteudo.trim())
     )?;
     Ok(())
 
