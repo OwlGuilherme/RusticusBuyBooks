@@ -1,11 +1,19 @@
 use modulos::database::add_produto;
+use modulos::database::show_produtos;
+use gui::main_window::show_main_window;
 
 mod modulos {
     pub mod database;
 }
 
-fn main() {
-    let _ = modulos::database::cria_db();
+mod gui {
+    pub mod main_window;
+}
 
-    let _ = add_produto();
+fn main() {
+    //let _ = modulos::database::cria_db();
+
+    //let _ = add_produto();
+    //let _ = show_produtos();
+    let _ = gui::main_window::show_main_window();
 }
