@@ -42,15 +42,22 @@ pub fn add_produto() -> Result<()> {
 pub fn show_produtos() -> Result<()> {
     let conn = Connection::open("compras.db")?;
 
-    let mut stmt = conn.prepare("SELECT Produto FROM produtos")?;
+    let mut stmt = conn.prepare("SELECT id, Produto, Marca_ou_qualidade, Conteúdo FROM produtos")?;
     
     let produtos = stmt.query_map([], |row|{
-        Ok(row.get::<_, String>(0)?)
+        Ok((row.get::<_, i32>(0)?,
+            row.get::<_, String>(1)?,
+            row.get::<_, String>(2)?,
+            row.get::<_, f32>(3)?,            
+        ))
     })?;
 
     for produto in produtos {
-        println!("{}", produto?);
+        if let Ok((id, nome, marca, conteudo)) = produto {
+            println!("ID: {}, Nome: {}, Marca: {}, Conteúdo: {}", id, nome, marca, conteudo);
+        }
     }
-
     Ok(())
 }
+
+
