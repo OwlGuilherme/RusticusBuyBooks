@@ -1,0 +1,94 @@
+[
+  {
+    "categoria": "automotivo",
+    "link": "https://www.bretas.com.br/automotivo?page="    
+  },
+  {
+    "categoria": "bazar",
+    "link": "https://www.bretas.com.br/bazar?page="    
+  },
+  {
+    "categoria": "bebes_e_infatil",
+    "link": "https://www.bretas.com.br/bebes-e-infatil?page="    
+  },
+  {
+    "categoria": "bebida_alcoolica",
+    "link": "https://www.bretas.com.br/bebida-alcoolica?page="    
+  },
+  {
+    "categoria": "bebida_nao_alcoolica",
+    "link": "https://www.bretas.com.br/bebida-nao-alcoolica?page="
+  },
+  {
+    "categoria": "brinquedos",
+    "link": "https://www.bretas.com.br/brinquedos?page="
+  },
+  {
+    "categoria": "cama_mesa_e_banho",
+    "link": "https://www.bretas.com.br/cama-mesa-e-banho?page="    
+  },
+  {
+    "categoria": "carnes_e_aves",
+    "link": "https://www.bretas.com.br/carnes-e-aves?page="
+  },
+  {
+    "categoria": "cabos_especiais",
+    "link": "https://www.bretas.com.br/combos-especiais?page="  
+  },
+  {
+    "categoria": "congelados",
+    "link": "https://www.bretas.com.br/congelados?page="    
+  },
+  {
+    "categoria": "eletro",
+    "link": "https://www.bretas.com.br/eletro?page="    
+  },
+  {
+    "categoria": "frios_e_laticinios",
+    "link": "https://www.bretas.com.br/frios-e-laticinios?page="    
+  },
+  {
+    "categoria": "higiene_e_beleza",
+    "link": "https://www.bretas.com.br/higiene-e-beleza?page="    
+  },
+  {
+    "categoria": "hortifruti",
+    "link": "https://www.bretas.com.br/hortifruti?page="    
+  },
+  {
+    "categoria": "jardinagem",
+    "link": "https://www.bretas.com.br/jardinagem?page="    
+  },
+  {
+    "categoria": "limpeza",
+    "link": "https://www.bretas.com.br/limpeza?page="    
+  },
+  {
+    "categoria": "mercearia",
+    "link": "https://www.bretas.com.br/mercearia?page="    
+  },
+  {
+    "categoria": "padaria",
+    "link": "https://www.bretas.com.br/padaria?page="    
+  },
+  {
+    "categoria": "peixaria",
+    "link": "https://www.bretas.com.br/peixaria?page="    
+  },
+  {
+    "categoria": "pet_shop",
+    "link": "https://www.bretas.com.br/pet-shop?page="    
+  },
+  {
+    "categoria": "saudaveis",
+    "link": "https://www.bretas.com.br/saudaveis?page="    
+  },
+  {
+    "categoria": "utilizades_e_casa",
+    "link": "https://www.bretas.com.br/utilidades-e-casa?page="    
+  },
+  {
+    "categoria": "vestuario",
+    "link": "https://www.bretas.com.br/vestuario?page="    
+  }
+]
