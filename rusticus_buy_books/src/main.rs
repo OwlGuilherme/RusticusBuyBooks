@@ -1,7 +1,8 @@
-use modulos::database::{add_produto, show_produtos, delete_produto};
+use modulos::database::{add_produto, cria_db, delete_produto, show_produtos};
 //use gui::main_window::show_main_window;
 
 use std::io;
+use std::path::Path;
 
 mod modulos {
     pub mod database;
@@ -25,6 +26,15 @@ fn show_menu() {
 }
 
 fn main() {
+
+    let db_path = "compras.db";
+    if !Path::new(db_path).exists() {
+        if let Err(e)= cria_db() {
+            eprintln!("Erro ao criar banco de dados: {}", e);
+            return;
+        }
+    }
+
     loop {
         show_menu();
 
