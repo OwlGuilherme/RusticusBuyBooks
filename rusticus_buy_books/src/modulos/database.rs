@@ -1,5 +1,4 @@
 use std::io;
-//use eframe::Result;
 use rusqlite::{Connection, Result};
 
 pub fn cria_db() -> Result<()> {
@@ -18,7 +17,6 @@ pub fn cria_db() -> Result<()> {
 }
 
 pub fn add_produto() -> Result<()> {
-
     let conn = Connection::open("compras.db")?;
 
     println!("Digite o nome do produto: ");
@@ -70,10 +68,11 @@ pub fn delete_produto() -> Result<()> {
     let mut id = String::new();
     io::stdin().read_line(&mut id).expect("Falha ao ler o ID");
 
-    //let id: i32 = id.trim().parse().expect("ID inválido, digite um número inteiro");
+    // Convertendo a string lida para i32
+    let id: i32 = id.trim().parse().expect("ID inválido, digite um número inteiro");
 
     conn.execute(
-        "DELETE FROM produtos WHERE id = ?1", &id      
+        "DELETE FROM produtos WHERE id = ?1", &[&id]
     )?;
     Ok(())
 }
