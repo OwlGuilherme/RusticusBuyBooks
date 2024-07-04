@@ -31,64 +31,51 @@ impl Database {
         Ok(())
     }
 
-    pub fn add_produto() -> Result<()> {
-        let conn = Connection::open("compras.db")?;
-
-        println!("Digite o nome do produto: ");
-        let mut nome = String::new();
-        io::stdin().read_line(&mut nome).expect("Falha ao ler o nome");
-
-        println!("Digite a marca do produto:");
-        let mut marca = String::new();
-        io::stdin().read_line(&mut marca).expect("Falha ao ler a marca");
-
-        println!("Digite o conteúdo do produto [litros ou kg]: ");
-        let mut conteudo = String::new();
-        io::stdin().read_line(&mut conteudo).expect("Falha ao ler conteúdo");
-
+    pub fn add_produto(&self, nome: &str, marca: &str, conteudo: f32, preco: f32) -> Result<()> {
+        let conn = self.conn.lock().unwrap();
         conn.execute(
-            "INSERT INTO produtos (Produto, Marca_ou_qualidade, Conteúdo) VALUES (?1, ?2, ?3)",
-            (&nome.trim(), &marca.trim(), &conteudo.trim())
+            "INSERT INTO produtos (Produto, Marca_ou_qualidade, Conteudo, Preco) VALUES (?1, ?2, ?3, ?4)",
+            (&nome, &marca, &conteudo, &preco),
         )?;
         Ok(())
     }
 
-    pub fn show_produtos() -> Result<()> {
-        let conn = Connection::open("compras.db")?;
-
-        let mut stmt = conn.prepare("SELECT id, Produto, Marca_ou_qualidade, Conteúdo FROM produtos")?;
+    pub fn show_produtos(&self) -> Result<Vec<(i32, String, String, f32, f32)>> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = conn.prepare("SELECT id, Produto, Marca_ou_qualidade, Conteudo, Preco FROM produtos")?;
         
-        let produtos = stmt.query_map([], |row|{
-            Ok((row.get::<_, i32>(0)?,
-                row.get::<_, String>(1)?,
-                row.get::<_, String>(2)?,
-                row.get::<_, f32>(3)?,            
-            ))
+        let produtos = stmt.query_map([], |row| {
+            Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?))
         })?;
 
+        let mut results = Vec::new();
         for produto in produtos {
-            if let Ok((id, nome, marca, conteudo)) = produto {
-                println!("ID: {}, Nome: {}, Marca: {}, Conteúdo: {}", id, nome, marca, conteudo);
-            }
+            results.push(produto?);
         }
+
+        Ok(results)
+    }
+
+    pub fn delete_produto(&self, id: i32) -> Result<()> {
+        let conn = self.conn.lock().unwrap();
+        conn.execute("DELETE FROM produtos WHERE id = ?1", &[&id])?;
         Ok(())
     }
 
-    pub fn delete_produto() -> Result<()> {
-        let conn = Connection::open("compras.db")?;
+    pub fn search_produtos(&self, query: &str) -> Result<Vec<(i32, String, String, f32, f32)>> {
+        let conn = self.conn.lock().unwrap();
+        let like_query = format!("%{}%", query);
+        let mut stmt = conn.prepare("SELECT id, Produto, Marca_ou_qualidade, Conteudo, Preco FROM produtos WHERE Produto LIKE ?1")?;
+        
+        let produtos = stmt.query_map([&like_query], |row| {
+            Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?))
+        })?;
 
-        show_produtos()?;
+        let mut results = Vec::new();
+        for produto in produtos {
+            results.push(produto?);
+        }
 
-        println!("Digite o ID do produto que deseja deletar: ");
-        let mut id = String::new();
-        io::stdin().read_line(&mut id).expect("Falha ao ler o ID");
-
-        // Convertendo a string lida para i32
-        let id: i32 = id.trim().parse().expect("ID inválido, digite um número inteiro");
-
-        conn.execute(
-            "DELETE FROM produtos WHERE id = ?1", &[&id]
-        )?;
-        Ok(())
+        Ok(results)
     }
 }
