@@ -1,21 +1,11 @@
-use modulos::database::{Database, add_produto, delete_produto, show_produtos};
-use std::io;
+use modulos::database::Database;
 
 mod modulos {
     pub mod database;
 }
 
-fn show_menu() {
-    println!("+---------------------------+");
-    println!("|        Rusticus           |");
-    println!("+---------------------------+");
-    println!("|    O que deseja fazer?    |");
-    println!("+- - - - - - - - - - - - - -+");
-    println!("| 1. Adicionar produto      |");
-    println!("| 2. Mostrar produtos       |");
-    println!("| 3. Deletar produto        |");
-    println!("| 4. Sair                   |");
-    println!("+---------------------------+");
+mod gui {
+    pub mod main_window;
 }
 
 fn main() {
@@ -28,30 +18,12 @@ fn main() {
         return;
     }
 
-    loop {
-        show_menu();
-
-        let mut choice = String::new();
-        io::stdin().read_line(&mut choice).expect("Falha ao ler a entrada");
-
-        match choice.trim() {
-            "1" => {
-                if let Err(e) = add_produto(&db) {
-                    eprintln!("Erro ao adicionar produto: {}", e);
-                }
-            },
-            "2" => {
-                if let Err(e) = show_produtos(&db) {
-                    eprintln!("Erro ao mostrar produtos: {}", e);
-                }
-            },
-            "3" => {
-                if let Err(e) = delete_produto(&db) {
-                    eprintln!("Erro ao deletar produto: {}", e);
-                }
-            },
-            "4" => break,
-            _ => println!("Opção inválida, por favor, escolha entre 1, 2, 3 ou 4."),
-        }
-    }
+    // Rodar a GUI
+    let app = gui::main_window::MyApp::new(db);
+    let native_options = eframe::NativeOptions::default();
+    eframe::run_native(
+        "Rusticus - Gerenciador de Produtos",
+        native_options,
+        Box::new(|_cc| Ok(Box::new(app))),
+    ).expect("Erro ao iniciar a aplicação");
 }
