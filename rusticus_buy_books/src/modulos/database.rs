@@ -45,7 +45,13 @@ impl Database {
         let mut stmt = conn.prepare("SELECT id, Produto, Marca_ou_qualidade, Conteudo, Preco FROM produtos")?;
         
         let produtos = stmt.query_map([], |row| {
-            Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?))
+            Ok((
+                row.get(0)?,
+                row.get(1)?,
+                row.get(2)?,
+                row.get(3)?,
+                row.get(4)?,
+            ))
         })?;
 
         let mut results = Vec::new();
@@ -68,7 +74,13 @@ impl Database {
         let mut stmt = conn.prepare("SELECT id, Produto, Marca_ou_qualidade, Conteudo, Preco FROM produtos WHERE Produto LIKE ?1")?;
         
         let produtos = stmt.query_map([&like_query], |row| {
-            Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?))
+            Ok((
+                row.get(0)?,
+                row.get(1)?,
+                row.get(2)?,
+                row.get(3)?,
+                row.get(4)?,
+            ))
         })?;
 
         let mut results = Vec::new();
