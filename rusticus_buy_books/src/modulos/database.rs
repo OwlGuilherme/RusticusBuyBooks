@@ -17,6 +17,7 @@ impl Database {
                 Produto TEXT NOT NULL,
                 Marca TEXT NOT NULL,
                 Conteudo FLOAT,
+                Unidade TEXT NOT NULL,
                 Preco FLOAT
             )",
             [],
@@ -24,18 +25,18 @@ impl Database {
         Ok(())
     }
 
-    pub fn add_produto(&self, produto: &str, marca: &str, conteudo: f32, preco: f32) -> Result<()> {
+    pub fn add_produto(&self, produto: &str, marca: &str, conteudo: f32, unidade: &str, preco: f32) -> Result<()> {
         self.conn.execute(
-            "INSERT INTO produtos (Produto, Marca, Conteudo, Preco) VALUES (?1, ?2, ?3, ?4)",
-            params![produto, marca, conteudo, preco],
+            "INSERT INTO produtos (Produto, Marca, Conteudo, Unidade, Preco) VALUES (?1, ?2, ?3, ?4, ?5)",
+            params![produto, marca, conteudo, unidade, preco],
         )?;
         Ok(())
     }
 
-    pub fn show_produtos(&self) -> Result<Vec<(i32, String, String, f32, f32)>> {
-        let mut stmt = self.conn.prepare("SELECT id, Produto, Marca, Conteudo, Preco FROM produtos")?;
+    pub fn show_produtos(&self) -> Result<Vec<(i32, String, String, f32, String, f32)>> {
+        let mut stmt = self.conn.prepare("SELECT id, Produto, Marca, Conteudo, Unidade, Preco FROM produtos")?;
         let produtos = stmt.query_map([], |row| {
-            Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?))
+            Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?, row.get(5)?))
         })?;
 
         let mut result = Vec::new();
@@ -50,19 +51,24 @@ impl Database {
         Ok(())
     }
 
-    pub fn search_produtos(&self, query: &str) -> Result<Vec<(i32, String, String, f32, f32)>> {
-        let like_query = format!("%{}%", query);
-        let mut stmt = self.conn.prepare(
-            "SELECT id, Produto, Marca, Conteudo, Preco FROM produtos WHERE Produto LIKE ?1 OR Marca LIKE ?1",
-        )?;
-        let produtos = stmt.query_map(params![like_query], |row| {
-            Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?))
+    pub fn search_produtos(&self, query: &str) -> Result<Vec<(i32, String, String, f32, String, f32)>> {
+        let mut stmt = self.conn.prepare("SELECT id, produto, marca, conteudo, unidade, preco FROM produtos WHERE produto LIKE ?1")?;
+        let query = format!("%{}%", query);
+        let produtos_iter = stmt.query_map([query], |row| {
+            Ok((
+                row.get(0)?,
+                row.get(1)?,
+                row.get(2)?,
+                row.get(3)?,
+                row.get(4)?,
+                row.get(5)?,
+            ))
         })?;
-
-        let mut result = Vec::new();
-        for produto in produtos {
-            result.push(produto?);
+        
+        let mut produtos = Vec::new();
+        for produto in produtos_iter {
+            produtos.push(produto?);
         }
-        Ok(result)
-    }
+        Ok(produtos)
+    }    
 }
