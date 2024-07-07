@@ -1,4 +1,5 @@
 use rusqlite::{params, Connection, Result};
+use chrono::prelude::*;
 
 pub struct Database {
     conn: Connection,
@@ -18,25 +19,40 @@ impl Database {
                 Marca TEXT NOT NULL,
                 Conteudo FLOAT,
                 Unidade TEXT NOT NULL,
-                Preco FLOAT
+                Preco FLOAT,
+                Data TEXT NOT NULL
             )",
             [],
         )?;
         Ok(())
     }
 
+    pub fn get_date() -> String {
+        let local: DateTime<Local> = Local::now();
+        local.format("%d-%m-%Y").to_string()
+    }
+
     pub fn add_produto(&self, produto: &str, marca: &str, conteudo: f32, unidade: &str, preco: f32) -> Result<()> {
+
+        let data = Database::get_date();
+
         self.conn.execute(
-            "INSERT INTO produtos (Produto, Marca, Conteudo, Unidade, Preco) VALUES (?1, ?2, ?3, ?4, ?5)",
-            params![produto, marca, conteudo, unidade, preco],
+            "INSERT INTO produtos (Produto, Marca, Conteudo, Unidade, Preco, Data) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+            params![produto, marca, conteudo, unidade, preco, data],
         )?;
         Ok(())
     }
 
-    pub fn show_produtos(&self) -> Result<Vec<(i32, String, String, f32, String, f32)>> {
-        let mut stmt = self.conn.prepare("SELECT id, Produto, Marca, Conteudo, Unidade, Preco FROM produtos")?;
+    pub fn show_produtos(&self) -> Result<Vec<(i32, String, String, f32, String, f32, String)>> {
+        let mut stmt = self.conn.prepare("SELECT id, Produto, Marca, Conteudo, Unidade, Preco, Data FROM produtos")?;
         let produtos = stmt.query_map([], |row| {
-            Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?, row.get(5)?))
+            Ok((row.get(0)?,
+            row.get(1)?,
+            row.get(2)?,
+            row.get(3)?,
+            row.get(4)?,
+            row.get(5)?,
+            row.get(6)?))
         })?;
 
         let mut result = Vec::new();
@@ -51,8 +67,8 @@ impl Database {
         Ok(())
     }
 
-    pub fn search_produtos(&self, query: &str) -> Result<Vec<(i32, String, String, f32, String, f32)>> {
-        let mut stmt = self.conn.prepare("SELECT id, produto, marca, conteudo, unidade, preco FROM produtos WHERE produto LIKE ?1")?;
+    pub fn search_produtos(&self, query: &str) -> Result<Vec<(i32, String, String, f32, String, f32, String)>> {
+        let mut stmt = self.conn.prepare("SELECT id, produto, marca, conteudo, unidade, preco, data FROM produtos WHERE produto LIKE ?1")?;
         let query = format!("%{}%", query);
         let produtos_iter = stmt.query_map([query], |row| {
             Ok((
@@ -62,6 +78,7 @@ impl Database {
                 row.get(3)?,
                 row.get(4)?,
                 row.get(5)?,
+                row.get(6)?,
             ))
         })?;
         
