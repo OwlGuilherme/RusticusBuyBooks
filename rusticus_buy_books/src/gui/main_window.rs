@@ -1,5 +1,6 @@
 use crate::modulos::database::Database;
 use eframe::egui::{self, CentralPanel, Context, ComboBox};
+use chrono::prelude::*;
 
 pub struct MyApp {
     db: Database,
@@ -8,8 +9,9 @@ pub struct MyApp {
     conteudo: String,      
     unidade: Unidade,  
     preco: String,
+    data: String,
     search_query: String,
-    search_results: Vec<(i32, String, String, f32, String, f32)>,
+    search_results: Vec<(i32, String, String, f32, String, f32, String)>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -26,8 +28,9 @@ impl MyApp {
             produto: String::new(),
             marca: String::new(),
             conteudo: String::new(),
-            unidade: Unidade::Litros,
+            unidade: Unidade::Quilogramas,
             preco: String::new(),
+            data: String::new(),
             search_query: String::new(),
             search_results: Vec::new(),
         }
@@ -37,7 +40,10 @@ impl MyApp {
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &Context, _: &mut eframe::Frame) {
         CentralPanel::default().show(ctx, |ui| {
+
+            ui.separator();
             ui.heading("Rusticus - Gerenciador de Produtos");
+            ui.separator();
 
             ui.horizontal(|ui| {
                 ui.label("Produto:");
@@ -74,13 +80,15 @@ impl eframe::App for MyApp {
                 if let Ok(conteudo) = self.conteudo.parse::<f32>() {
                     let unidade = format!("{:?}", self.unidade);
                     if let Ok(preco) = self.preco.parse::<f32>() {
-                        if let Err(e) = self.db.add_produto(&self.produto, &self.marca, conteudo, &unidade, preco) {
+                        let local: DateTime<Local> = Local::now();
+                        let data = local.format("%d-%m-%Y").to_string();
+                        if let Err(e) = self.db.add_produto(&self.produto, &self.marca, conteudo, &unidade, preco, &data) {
                             eprintln!("Erro ao adicionar produto: {}", e);
                         } else {
                             self.produto.clear();
                             self.marca.clear();
                             self.conteudo.clear();
-                            self.unidade = Unidade::Litros;  // Reset para o valor padrão
+                            self.unidade = Unidade::Quilogramas;  // Reset para o valor padrão
                             self.preco.clear();
                         }
                     } else {
@@ -105,9 +113,9 @@ impl eframe::App for MyApp {
 
             // Coletar os IDs dos produtos a serem removidos
             let mut ids_to_remove = Vec::new();
-            for (id, produto, marca, conteudo, unidade, preco) in &self.search_results {
+            for (id, produto, marca, conteudo, unidade, preco, data) in &self.search_results {
                 ui.horizontal(|ui| {
-                    ui.label(format!("{} - {} - {} - {} - {} - {}", id, produto, marca, conteudo, unidade, preco));
+                    ui.label(format!("{} - {} - {} - {} - {} - {} - {}", id, produto, marca, conteudo, unidade, preco, data));
                     if ui.button("Deletar").clicked() {
                         ids_to_remove.push(*id);
                     }
@@ -119,7 +127,7 @@ impl eframe::App for MyApp {
                 if let Err(e) = self.db.delete_produto(id) {
                     eprintln!("Erro ao deletar produto: {}", e);
                 } else {
-                    self.search_results.retain(|(pid, _, _, _, _, _)| pid != &id);
+                    self.search_results.retain(|(pid, _, _, _, _, _, _,)| pid != &id);
                 }
             }
         });
