@@ -1,5 +1,4 @@
 use rusqlite::{params, Connection, Result};
-use chrono::prelude::*;
 
 pub struct Database {
     conn: Connection,
@@ -25,17 +24,9 @@ impl Database {
             [],
         )?;
         Ok(())
-    }
+    }    
 
-    pub fn get_date() -> String {
-        let local: DateTime<Local> = Local::now();
-        local.format("%d-%m-%Y").to_string()
-    }
-
-    pub fn add_produto(&self, produto: &str, marca: &str, conteudo: f32, unidade: &str, preco: f32) -> Result<()> {
-
-        let data = Database::get_date();
-
+    pub fn add_produto(&self, produto: &str, marca: &str, conteudo: f32, unidade: &str, preco: f32, data: &str) -> Result<()> {
         self.conn.execute(
             "INSERT INTO produtos (Produto, Marca, Conteudo, Unidade, Preco, Data) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
             params![produto, marca, conteudo, unidade, preco, data],
